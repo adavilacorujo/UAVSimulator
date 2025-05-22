@@ -1,5 +1,5 @@
 const express = require('express');
-const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const path = require('path');
@@ -9,6 +9,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client')));
+
+// SSL/TLS Certificate options
+const options = {};
+const keyPath = path.join(__dirname, 'certs/key.pem');
+const certPath = path.join(__dirname, 'certs/cert.pem');
+
+try {
+  if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+    options.key = fs.readFileSync(keyPath);
+    options.cert = fs.readFileSync(certPath);
+    console.log('SSL certificates loaded successfully.');
+  } else {
+    console.error('SSL certificate files not found. Starting in HTTP mode (not recommended for production or multi-device access).');
+    // Fallback to HTTP if certs are not found for some reason, though the intention is HTTPS
+    // For this exercise, we assume certs exist. If not, HTTPS server creation will fail.
+  }
+} catch (err) {
+  console.error('Error loading SSL certificates:', err);
+  // Exit or fallback to HTTP might be needed here
+  process.exit(1); // Exit if certs are expected but can't be loaded
+}
 
 // Add a health check endpoint
 app.get('/health', (req, res) => {
@@ -20,7 +41,19 @@ app.get('/', (req, res) => {
   res.redirect('/viewer/');
 });
 
-const server = http.createServer(app);
+// Create HTTPS server if certs were loaded
+let server;
+if (options.key && options.cert) {
+  server = https.createServer(options, app);
+  console.log('HTTPS server created.');
+} else {
+  // This block should ideally not be reached if certs are mandatory as per above logic
+  console.warn('Starting server in HTTP mode as SSL certificates were not loaded.');
+  const http = require('http'); // require http here for fallback
+  server = http.createServer(app);
+  console.log('HTTP server created (fallback).');
+}
+
 const io = socketIo(server, {
   cors: {
     origin: '*',
@@ -219,8 +252,15 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n=== UAV Browser Simulator Server ===`);
   console.log(`Server running on port ${PORT}`);
-  console.log(`- Drone UI: http://localhost:${PORT}/drone/`);
-  console.log(`- Viewer UI: http://localhost:${PORT}/viewer/`);
-  console.log(`\nIMPORTANT: For production use, configure HTTPS to ensure camera and geolocation access works properly.`);
+  if (options.key && options.cert) {
+    console.log(`- Drone UI: https://localhost:${PORT}/drone/`);
+    console.log(`- Viewer UI: https://localhost:${PORT}/viewer/`);
+    console.log(`\nIMPORTANT: Access via HTTPS. You may need to accept a browser security warning for self-signed certificates.`);
+    console.log(`  To access from other devices on your network, use this machine's local IP address, e.g., https://YOUR_LOCAL_IP:${PORT}/viewer/`);
+  } else {
+    console.log(`- Drone UI: http://localhost:${PORT}/drone/`);
+    console.log(`- Viewer UI: http://localhost:${PORT}/viewer/`);
+    console.log(`\nWARNING: Running in HTTP mode. Camera/microphone access and multi-device access may be restricted.`);
+  }
   console.log(`=================================\n`);
 }); 
