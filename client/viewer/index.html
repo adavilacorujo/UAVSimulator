@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UAV Browser Simulator - Viewer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>UAV Ground Control Station</h1>
+      <div class="status-indicator" id="connection-status">Waiting for drone</div>
+    </header>
+    
+    <main>
+      <div class="video-container">
+        <div class="video-feed">
+          <video id="remote-video" autoplay playsinline></video>
+          <div class="no-signal" id="no-signal">No Signal</div>
+        </div>
+        <div class="telemetry-panel">
+          <h3>Telemetry Data</h3>
+          <div class="telemetry-grid">
+            <div class="telemetry-item">
+              <span class="label">Latitude:</span>
+              <span class="value" id="latitude">--</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="label">Longitude:</span>
+              <span class="value" id="longitude">--</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="label">Altitude:</span>
+              <span class="value" id="altitude">-- m</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="label">Heading:</span>
+              <span class="value" id="heading">-- °</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="label">Speed:</span>
+              <span class="value" id="speed">-- m/s</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="label">Last Update:</span>
+              <span class="value" id="last-update">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+      
+      <div class="info-panel">
+        <h3>System Messages</h3>
+        <div id="messages-container"></div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Import utility scripts -->
+  <script src="../js/webrtc-utils.js"></script>
+  <script src="../js/telemetry-utils.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html> 

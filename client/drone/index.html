@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UAV Browser Simulator - Drone</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>UAV Simulator</h1>
+      <div class="status-indicator" id="connection-status">Disconnected</div>
+    </header>
+    
+    <main>
+      <div class="camera-feed">
+        <video id="local-video" autoplay muted playsinline></video>
+        <div class="overlay">
+          <div class="telemetry-info" id="telemetry-info">
+            <div class="telemetry-source">
+              <span id="telemetry-source-indicator">--</span>
+            </div>
+            <div>Lat: <span id="latitude">--</span></div>
+            <div>Lon: <span id="longitude">--</span></div>
+            <div>Alt: <span id="altitude">--</span> m</div>
+            <div>Heading: <span id="heading">--</span>°</div>
+            <div>Speed: <span id="speed">--</span> m/s</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button id="connect-btn" class="primary-btn">Connect</button>
+        <button id="disconnect-btn" class="secondary-btn" disabled>Disconnect</button>
+        <div class="checkbox-container">
+          <input type="checkbox" id="simulation-mode" checked>
+          <label for="simulation-mode">Allow Simulation Fallback</label>
+          <div class="info-tooltip">
+            <span class="tooltip-icon">?</span>
+            <span class="tooltip-text">When checked, allows simulation if real GPS is unavailable. Real GPS is always used when available.</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="messages">
+        <h3>System Messages</h3>
+        <div id="messages-container"></div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Import utility scripts -->
+  <script src="../js/webrtc-utils.js"></script>
+  <script src="../js/telemetry-utils.js"></script>
+  <script src="drone.js"></script>
+</body>
+</html> 
